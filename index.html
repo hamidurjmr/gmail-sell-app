@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User - Gmail Sell App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .sell-btn, .withdraw-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sell-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .withdraw-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .sell-btn:hover, .withdraw-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .requests-list {
+            grid-column: span 2;
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .request-item {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 15px 0;
+        }
+        
+        .request-item:last-child {
+            border-bottom: none;
+        }
+        
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .request-status {
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-accepted {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .logout-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .withdrawals-list {
+            margin-top: 30px;
+        }
+        
+        .min-withdrawal {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Section -->
+        <div id="loginSection" class="login-container">
+            <h2>🔐 Login to Start Selling</h2>
+            <p style="color: #666; margin-bottom: 20px;">Earn $3 per Gmail sell</p>
+            <button class="login-btn" onclick="loginWithGoogle()">Login with Google</button>
+        </div>
+
+        <!-- User Dashboard -->
+        <div id="dashboardSection" class="hidden">
+            <div class="header">
+                <h1>📧 Gmail Sell App</h1>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span class="balance-card" id="userBalance">$0.00</span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <!-- Sell Gmail Form -->
+                <div class="card">
+                    <h2>Sell Gmail Account</h2>
+                    <div class="form-group">
+                        <label>Gmail Address</label>
+                        <input type="email" id="gmailInput" placeholder="Enter Gmail">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="text" id="passwordInput" placeholder="Enter Password">
+                    </div>
+                    <button class="sell-btn" onclick="sellGmail()">Sell for $3</button>
+                </div>
+
+                <!-- Withdraw Form -->
+                <div class="card">
+                    <h2>Withdraw Funds</h2>
+                    <div class="min-withdrawal">
+                        Minimum withdrawal: $10
+                    </div>
+                    <div class="form-group">
+                        <label>Bitcoin Address</label>
+                        <input type="text" id="bitcoinInput" placeholder="Enter BTC Address">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount ($)</label>
+                        <input type="number" id="amountInput" placeholder="Enter amount" min="10">
+                    </div>
+                    <button class="withdraw-btn" onclick="requestWithdrawal()">Request Withdrawal</button>
+                </div>
+
+                <!-- Sell Requests History -->
+                <div class="requests-list">
+                    <h2>Your Sell Requests</h2>
+                    <div id="sellRequests"></div>
+                </div>
+
+                <!-- Withdrawal Requests -->
+                <div class="requests-list withdrawals-list">
+                    <h2>Withdrawal Requests</h2>
+                    <div id="withdrawalRequests"></div>
+                </div>
+            </div>
+
+            <div id="messageArea"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCF7UcnAVIZFX9bHydLsh7BX9OrqXq5nfA",
+            authDomain: "sell-app-c066a.firebaseapp.com",
+            projectId: "sell-app-c066a",
+            storageBucket: "sell-app-c066a.firebasestorage.app",
+            messagingSenderId: "69684837328",
+            appId: "1:69684837328:web:05dedc991c1549417c57d5"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+
+        // Check auth state
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboardSection').classList.remove('hidden');
+                
+                // Create/update user in database
+                createUserInDB(user);
+                
+                // Load user data
+                loadUserData(user.uid);
+            } else {
+                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('dashboardSection').classList.add('hidden');
+            }
+        });
+
+        // Login with Google
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                showMessage('Login failed: ' + error.message, 'error');
+            });
+        }
+
+        // Logout
+        function logout() {
+            auth.signOut();
+        }
+
+        // Create user in Firestore
+        function createUserInDB(user) {
+            const userRef = db.collection('users').doc(user.uid);
+            userRef.get().then((doc) => {
+                if (!doc.exists) {
+                    userRef.set({
+                        email: user.email,
+                        name: user.displayName,
+                        photoURL: user.photoURL,
+                        balance: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            });
+        }
+
+        // Load user data
+        function loadUserData(userId) {
+            // Load user balance
+            db.collection('users').doc(userId).onSnapshot((doc) => {
+                if (doc.exists) {
+                    const balance = doc.data().balance || 0;
+                    document.getElementById('userBalance').textContent = '$' + balance.toFixed(2);
+                }
+            });
+
+            // Load sell requests
+            db.collection('sellRequests')
+                .where('userId', '==', userId)
+                .orderBy('timestamp', 'desc')
+                .onSnapshot((snapshot) => {
+                    const requests = [];
+                    snapshot.forEach(doc => {
+                        requests.push({ id: doc.id, ...doc.data() });
+                    });
+                    displaySellRequests(requests);
+                });
+
+            // Load withdrawal requests
+            db.collection('withdrawals')
+                .where('userId', '==', userId)
+                .orderBy('timestamp', 'desc')
+                .onSnapshot((snapshot) => {
+                    const withdrawals = [];
+                    snapshot.forEach(doc => {
+                        withdrawals.push({ id: doc.id, ...doc.data() });
+                    });
+                    displayWithdrawalRequests(withdrawals);
+                });
+        }
+
+        // Sell Gmail
+        function sellGmail() {
+            const gmail = document.getElementById('gmailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            
+            if (!gmail || !password) {
+                showMessage('Please fill all fields', 'error');
+                return;
+            }
+            
+            if (!gmail.includes('@gmail.com')) {
+                showMessage('Please enter a valid Gmail address', 'error');
+                return;
+            }
+            
+            db.collection('sellRequests').add({
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                gmail: gmail,
+                password: password,
+                status: 'pending',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                document.getElementById('gmailInput').value = '';
+                document.getElementById('passwordInput').value = '';
+                showMessage('Sell request submitted successfully!', 'success');
+            }).catch(error => {
+                showMessage('Error: ' + error.message, 'error');
+            });
+        }
+
+        // Request withdrawal
+        function requestWithdrawal() {
+            const bitcoinAddress = document.getElementById('bitcoinInput').value;
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            
+            if (!bitcoinAddress || !amount) {
+                showMessage('Please fill all fields', 'error');
+                return;
+            }
+            
+            if (amount < 10) {
+                showMessage('Minimum withdrawal amount is $10', 'error');
+                return;
+            }
+            
+            // Check user balance
+            db.collection('users').doc(currentUser.uid).get().then((doc) => {
+                if (doc.exists) {
+                    const balance = doc.data().balance || 0;
+                    
+                    if (amount > balance) {
+                        showMessage('Insufficient balance', 'error');
+                        return;
+                    }
+                    
+                    // Create withdrawal request
+                    db.collection('withdrawals').add({
+                        userId: currentUser.uid,
+                        userEmail: currentUser.email,
+                        bitcoinAddress: bitcoinAddress,
+                        amount: amount,
+                        userBalance: balance,
+                        status: 'pending',
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        document.getElementById('bitcoinInput').value = '';
+                        document.getElementById('amountInput').value = '';
+                        showMessage('Withdrawal request submitted!', 'success');
+                    }).catch(error => {
+                        showMessage('Error: ' + error.message, 'error');
+                    });
+                }
+            });
+        }
+
+        // Display sell requests
+        function displaySellRequests(requests) {
+            const container = document.getElementById('sellRequests');
+            
+            if (requests.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center;">No sell requests yet</p>';
+                return;
+            }
+            
+            let html = '';
+            requests.forEach(request => {
+                html += `
+                    <div class="request-item">
+                        <div class="request-header">
+                            <strong>${request.gmail}</strong>
+                            <span class="request-status status-${request.status}">${request.status}</span>
+                        </div>
+                        <div style="color: #666; font-size: 14px;">
+                            ${request.reason ? `Reason: ${request.reason}` : ''}
+                        </div>
+                        <div style="color: #999; font-size: 12px; margin-top: 5px;">
+                            ${new Date(request.timestamp?.toDate()).toLocaleString()}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Display withdrawal requests
+        function displayWithdrawalRequests(withdrawals) {
+            const container = document.getElementById('withdrawalRequests');
+            
+            if (withdrawals.length === 0) {
+                container.innerHTML = '<p style="color: #666; text-align: center;">No withdrawal requests yet</p>';
+                return;
+            }
+            
+            let html = '';
+            withdrawals.forEach(withdrawal => {
+                html += `
+                    <div class="request-item">
+                        <div class="request-header">
+                            <strong>$${withdrawal.amount}</strong>
+                            <span class="request-status status-${withdrawal.status}">${withdrawal.status}</span>
+                        </div>
+                        <div style="color: #666; font-size: 14px;">
+                            BTC: ${withdrawal.bitcoinAddress.substring(0, 15)}...
+                        </div>
+                        <div style="color: #999; font-size: 12px; margin-top: 5px;">
+                            ${new Date(withdrawal.timestamp?.toDate()).toLocaleString()}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const area = document.getElementById('messageArea');
+            area.innerHTML = `<div class="message ${type}">${text}</div>`;
+            setTimeout(() => {
+                area.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
