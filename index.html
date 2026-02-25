@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail Sell - Earn Money</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: #f5f7fb;
+        }
+        
+        /* Login Page */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .login-box i {
+            font-size: 60px;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .login-box h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .login-box p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .earn-badge {
+            background: #f0f2f5;
+            padding: 10px;
+            border-radius: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .earn-badge span {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-weight: bold;
+        }
+        
+        .google-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .google-btn:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .nav-brand i {
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .balance {
+            background: #28a745;
+            color: white;
+            padding: 8px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
+        }
+        
+        .logout-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+        
+        /* Notifications */
+        .notifications {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 350px;
+        }
+        
+        .notification {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s;
+            border-left: 4px solid;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification.success {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .notification.error {
+            border-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .notification.info {
+            border-color: #17a2b8;
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        /* Main Content */
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+        
+        .card-header h3 {
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+        
+        .card-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        }
+        
+        .min-withdrawal {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1976d2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* History Tabs */
+        .history-tabs {
+            display: flex;
+            gap: 10px;
+            padding: 0 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .history-tab {
+            padding: 12px 30px;
+            background: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #666;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .history-tab:hover {
+            background: #f0f2f5;
+        }
+        
+        .history-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .history-section {
+            padding: 0 30px 30px;
+        }
+        
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .history-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border: 1px solid #eee;
+        }
+        
+        .history-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .history-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .history-status {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-accepted,
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .history-detail {
+            color: #666;
+            font-size: 13px;
+            margin: 8px 0;
+            word-break: break-all;
+        }
+        
+        .history-detail i {
+            width: 20px;
+            color: #999;
+        }
+        
+        .history-reason {
+            background: #fee;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-top: 10px;
+            color: #721c24;
+            border-left: 3px solid #dc3545;
+        }
+        
+        .history-time {
+            color: #999;
+            font-size: 11px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <i class="fas fa-envelope-open-text"></i>
+            <h2>Welcome Back!</h2>
+            <p>Sell your Gmails and earn $3 each</p>
+            
+            <div class="earn-badge">
+                <i class="fas fa-dollar-sign"></i>
+                <span>Earn $3 per Gmail</span>
+                <i class="fas fa-bolt"></i>
+            </div>
+            
+            <button class="google-btn" onclick="loginWithGoogle()">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </button>
+            
+            <p style="margin-top: 20px; font-size: 12px; color: #999;">
+                <i class="fas fa-shield-alt"></i> Secure & Encrypted
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <!-- Notifications -->
+        <div id="notifications" class="notifications"></div>
+
+        <!-- Navbar -->
+        <div class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-envelope"></i>
+                Gmail Sell
+            </div>
+            <div class="user-info">
+                <div class="balance" id="balance">$0.00</div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Sell Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-shopping-cart"></i> Sell Gmail</h3>
+                    <p>Get $3 for each valid Gmail</p>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Gmail Address</label>
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" class="form-control" id="gmail" placeholder="example@gmail.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="text" class="form-control" id="password" placeholder="Enter password">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="sellGmail()">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit & Earn $3
+                    </button>
+                </div>
+            </div>
+
+            <!-- Withdraw Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-money-bill-wave"></i> Withdraw Funds</h3>
+                    <p>Minimum withdrawal $10</p>
+                </div>
+                <div class="card-body">
+                    <div class="min-withdrawal">
+                        <i class="fas fa-info-circle"></i>
+                        Available Balance: <strong id="availableBalance">$0.00</strong>
+                    </div>
+                    <div class="form-group">
+                        <label>Bitcoin Address</label>
+                        <div class="input-group">
+                            <i class="fab fa-bitcoin"></i>
+                            <input type="text" class="form-control" id="btc" placeholder="Enter BTC address">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount ($)</label>
+                        <div class="input-group">
+                            <i class="fas fa-dollar-sign"></i>
+                            <input type="number" class="form-control" id="amount" placeholder="Min $10" min="10" step="0.01">
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="withdraw()">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        Request Withdrawal
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tabs -->
+        <div class="history-tabs">
+            <button class="history-tab active" onclick="showHistory('sell')">
+                <i class="fas fa-envelope"></i> Sell History
+            </button>
+            <button class="history-tab" onclick="showHistory('withdrawal')">
+                <i class="fas fa-money-bill-wave"></i> Withdrawal History
+            </button>
+            <button class="history-tab" onclick="showHistory('all')">
+                <i class="fas fa-history"></i> All Transactions
+            </button>
+        </div>
+
+        <!-- Sell History -->
+        <div id="sellHistory" class="history-section">
+            <div id="sellGrid" class="history-grid"></div>
+        </div>
+
+        <!-- Withdrawal History -->
+        <div id="withdrawalHistory" class="history-section hidden">
+            <div id="withdrawalGrid" class="history-grid"></div>
+        </div>
+
+        <!-- All History -->
+        <div id="allHistory" class="history-section hidden">
+            <div id="allGrid" class="history-grid"></div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCF7UcnAVIZFX9bHydLsh7BX9OrqXq5nfA",
+            authDomain: "sell-app-c066a.firebaseapp.com",
+            projectId: "sell-app-c066a",
+            storageBucket: "sell-app-c066a.firebasestorage.app",
+            messagingSenderId: "69684837328",
+            appId: "1:69684837328:web:05dedc991c1549417c57d5"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let userSells = [];
+        let userWithdrawals = [];
+
+        // Auth State
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                
+                // Create user if new
+                createUser(user);
+                
+                // Load user data
+                loadUserData(user.uid);
+                
+                showNotification('✅ Logged in as ' + user.email, 'success');
+            } else {
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('dashboard').style.display = 'none';
+                currentUser = null;
+            }
+        });
+
+        // Login
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                showNotification('Login failed: ' + error.message, 'error');
+            });
+        }
+
+        // Logout
+        function logout() {
+            auth.signOut();
+        }
+
+        // Create User
+        function createUser(user) {
+            const userRef = db.collection('users').doc(user.uid);
+            userRef.get().then(doc => {
+                if (!doc.exists) {
+                    userRef.set({
+                        email: user.email,
+                        balance: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            }).catch(error => {
+                showNotification('Error creating user: ' + error.message, 'error');
+            });
+        }
+
+        // Load User Data
+        function loadUserData(userId) {
+            // Balance
+            db.collection('users').doc(userId).onSnapshot(doc => {
+                if (doc.exists) {
+                    const balance = doc.data().balance || 0;
+                    document.getElementById('balance').textContent = '$' + balance.toFixed(2);
+                    document.getElementById('availableBalance').textContent = '$' + balance.toFixed(2);
+                }
+            }, error => {
+                showNotification('Error loading balance: ' + error.message, 'error');
+            });
+
+            // Sell Requests
+            db.collection('sellRequests')
+                .where('userId', '==', userId)
+                .orderBy('timestamp', 'desc')
+                .onSnapshot(snapshot => {
+                    userSells = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        userSells.push({ id: doc.id, ...data });
+                        
+                        // Check for status changes
+                        if (data.status === 'accepted') {
+                            showNotification('🎉 Your Gmail was accepted! +$3 added', 'success');
+                        } else if (data.status === 'rejected') {
+                            showNotification('❌ Gmail rejected: ' + data.reason, 'error');
+                        }
+                    });
+                    
+                    updateHistory();
+                    
+                }, error => {
+                    if (error.message.includes('index')) {
+                        showNotification('Please wait: Indexes are being created. This takes 2-3 minutes.', 'info');
+                    } else {
+                        showNotification('Error loading sell requests: ' + error.message, 'error');
+                    }
+                });
+
+            // Withdrawals
+            db.collection('withdrawals')
+                .where('userId', '==', userId)
+                .orderBy('timestamp', 'desc')
+                .onSnapshot(snapshot => {
+                    userWithdrawals = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        userWithdrawals.push({ id: doc.id, ...data });
+                        
+                        if (data.status === 'completed') {
+                            showNotification('💰 Withdrawal of $' + data.amount + ' completed!', 'success');
+                        }
+                    });
+                    
+                    updateHistory();
+                    
+                }, error => {
+                    if (error.message.includes('index')) {
+                        showNotification('Please wait: Indexes are being created. This takes 2-3 minutes.', 'info');
+                    } else {
+                        showNotification('Error loading withdrawals: ' + error.message, 'error');
+                    }
+                });
+        }
+
+        // Sell Gmail
+        function sellGmail() {
+            const gmail = document.getElementById('gmail').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!gmail || !password) {
+                showNotification('Please fill all fields', 'error');
+                return;
+            }
+            
+            if (!gmail.includes('@')) {
+                showNotification('Enter a valid email', 'error');
+                return;
+            }
+            
+            db.collection('sellRequests').add({
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                gmail: gmail,
+                password: password,
+                status: 'pending',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                document.getElementById('gmail').value = '';
+                document.getElementById('password').value = '';
+                showNotification('✅ Request submitted! Waiting for admin.', 'success');
+            }).catch(error => {
+                showNotification('Error: ' + error.message, 'error');
+            });
+        }
+
+        // Withdraw
+        function withdraw() {
+            const btc = document.getElementById('btc').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            
+            if (!btc || !amount) {
+                showNotification('Please fill all fields', 'error');
+                return;
+            }
+            
+            if (amount < 10) {
+                showNotification('Minimum withdrawal is $10', 'error');
+                return;
+            }
+            
+            db.collection('users').doc(currentUser.uid).get().then(doc => {
+                const balance = doc.data().balance || 0;
+                
+                if (amount > balance) {
+                    showNotification('Insufficient balance', 'error');
+                    return;
+                }
+                
+                db.collection('withdrawals').add({
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    bitcoinAddress: btc,
+                    amount: amount,
+                    userBalance: balance,
+                    status: 'pending',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    document.getElementById('btc').value = '';
+                    document.getElementById('amount').value = '';
+                    showNotification('💰 Withdrawal requested!', 'success');
+                }).catch(error => {
+                    showNotification('Error: ' + error.message, 'error');
+                });
+            }).catch(error => {
+                showNotification('Error: ' + error.message, 'error');
+            });
+        }
+
+        // Show History Tab
+        function showHistory(type) {
+            document.querySelectorAll('.history-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('sellHistory').classList.add('hidden');
+            document.getElementById('withdrawalHistory').classList.add('hidden');
+            document.getElementById('allHistory').classList.add('hidden');
+            
+            if (type === 'sell') {
+                document.getElementById('sellHistory').classList.remove('hidden');
+                displaySellHistory();
+            } else if (type === 'withdrawal') {
+                document.getElementById('withdrawalHistory').classList.remove('hidden');
+                displayWithdrawalHistory();
+            } else {
+                document.getElementById('allHistory').classList.remove('hidden');
+                displayAllHistory();
+            }
+        }
+
+        // Update History
+        function updateHistory() {
+            const active = document.querySelector('.history-tab.active');
+            if (active) {
+                const text = active.textContent;
+                if (text.includes('Sell')) displaySellHistory();
+                else if (text.includes('Withdrawal')) displayWithdrawalHistory();
+                else displayAllHistory();
+            } else {
+                displaySellHistory();
+            }
+        }
+
+        // Display Sell History
+        function displaySellHistory() {
+            const grid = document.getElementById('sellGrid');
+            
+            if (userSells.length === 0) {
+                grid.innerHTML = '<div style="text-align: center; padding: 40px; background: white; border-radius: 8px;">No sell requests yet</div>';
+                return;
+            }
+            
+            let html = '';
+            userSells.forEach(sell => {
+                const date = sell.timestamp?.toDate ? new Date(sell.timestamp.toDate()).toLocaleString() : 'Just now';
+                
+                html += `
+                    <div class="history-card">
+                        <div class="history-header">
+                            <span class="history-title">📧 ${sell.gmail}</span>
+                            <span class="history-status status-${sell.status}">${sell.status}</span>
+                        </div>
+                        <div class="history-detail"><i class="fas fa-lock"></i> Password: ${sell.password}</div>
+                        ${sell.status === 'accepted' ? '<div class="history-detail"><i class="fas fa-check-circle" style="color:#28a745"></i> +$3 earned</div>' : ''}
+                        ${sell.reason ? `<div class="history-reason"><i class="fas fa-exclamation-triangle"></i> ${sell.reason}</div>` : ''}
+                        <div class="history-time"><i class="far fa-clock"></i> ${date}</div>
+                    </div>
+                `;
+            });
+            
+            grid.innerHTML = html;
+        }
+
+        // Display Withdrawal History
+        function displayWithdrawalHistory() {
+            const grid = document.getElementById('withdrawalGrid');
+            
+            if (userWithdrawals.length === 0) {
+                grid.innerHTML = '<div style="text-align: center; padding: 40px; background: white; border-radius: 8px;">No withdrawal requests</div>';
+                return;
+            }
+            
+            let html = '';
+            userWithdrawals.forEach(w => {
+                const date = w.timestamp?.toDate ? new Date(w.timestamp.toDate()).toLocaleString() : 'Just now';
+                
+                html += `
+                    <div class="history-card">
+                        <div class="history-header">
+                            <span class="history-title">💰 $${w.amount}</span>
+                            <span class="history-status status-${w.status}">${w.status}</span>
+                        </div>
+                        <div class="history-detail"><i class="fab fa-bitcoin"></i> BTC: ${w.bitcoinAddress.substring(0, 15)}...</div>
+                        <div class="history-detail"><i class="fas fa-wallet"></i> Balance before: $${w.userBalance}</div>
+                        <div class="history-time"><i class="far fa-clock"></i> ${date}</div>
+                    </div>
+                `;
+            });
+            
+            grid.innerHTML = html;
+        }
+
+        // Display All History
+        function displayAllHistory() {
+            const grid = document.getElementById('allGrid');
+            let all = [];
+            
+            userSells.forEach(s => all.push({
+                icon: '📧',
+                title: s.gmail,
+                status: s.status,
+                detail1: 'Password: ' + s.password,
+                detail2: s.status === 'accepted' ? '+$3' : '$0',
+                amount: s.status === 'accepted' ? '+$3' : '$0',
+                reason: s.reason,
+                date: s.timestamp?.toDate ? s.timestamp.toDate() : new Date(),
+                time: s.timestamp
+            }));
+            
+            userWithdrawals.forEach(w => all.push({
+                icon: '💰',
+                title: '$' + w.amount,
+                status: w.status,
+                detail1: 'BTC: ' + w.bitcoinAddress.substring(0, 15) + '...',
+                detail2: 'Balance before: $' + w.userBalance,
+                amount: '-$' + w.amount,
+                date: w.timestamp?.toDate ? w.timestamp.toDate() : new Date(),
+                time: w.timestamp
+            }));
+            
+            all.sort((a, b) => b.date - a.date);
+            
+            if (all.length === 0) {
+                grid.innerHTML = '<div style="text-align: center; padding: 40px; background: white; border-radius: 8px;">No transactions</div>';
+                return;
+            }
+            
+            let html = '';
+            all.forEach(t => {
+                const date = t.time?.toDate ? new Date(t.time.toDate()).toLocaleString() : 'Just now';
+                
+                html += `
+                    <div class="history-card">
+                        <div class="history-header">
+                            <span class="history-title">${t.icon} ${t.title}</span>
+                            <span class="history-status status-${t.status}">${t.status}</span>
+                        </div>
+                        <div class="history-detail">${t.detail1}</div>
+                        <div class="history-detail">${t.detail2}</div>
+                        ${t.reason ? `<div class="history-reason"><i class="fas fa-exclamation-triangle"></i> ${t.reason}</div>` : ''}
+                        <div class="history-time"><i class="far fa-clock"></i> ${date}</div>
+                    </div>
+                `;
+            });
+            
+            grid.innerHTML = html;
+        }
+
+        // Show Notification
+        function showNotification(message, type) {
+            const area = document.getElementById('notifications');
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.innerHTML = message;
+            area.appendChild(notif);
+            
+            setTimeout(() => notif.remove(), 5000);
+        }
+    </script>
+</body>
+</html>
