@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>GmailSell - Earn $1.20 per Gmail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #03050b;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Cyberpunk Grid Background */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139,92,246,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+        }
+
+        /* Animated Neon Orbs */
+        .neon-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: pulseOrb 15s infinite ease-in-out;
+        }
+
+        .orb-blue { width: 600px; height: 600px; background: rgba(59,130,246,0.3); top: -200px; right: -200px; animation-delay: 0s; }
+        .orb-purple { width: 500px; height: 500px; background: rgba(139,92,246,0.3); bottom: -150px; left: -150px; animation-delay: 5s; }
+        .orb-pink { width: 400px; height: 400px; background: rgba(236,72,153,0.2); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 10s; }
+
+        @keyframes pulseOrb {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3,5,11,0.85);
+            backdrop-filter: blur(40px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: linear-gradient(135deg, rgba(15,25,45,0.9), rgba(5,10,25,0.95));
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            padding: 55px 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(59,130,246,0.3);
+            box-shadow: 0 0 40px rgba(59,130,246,0.2);
+            animation: neonGlow 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
+        }
+
+        @keyframes neonGlow {
+            0% { opacity: 0; transform: scale(0.9) translateY(30px); filter: blur(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
+
+        .cyber-logo {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec489a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .login-card p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 35px;
+        }
+
+        .google-cyber {
+            background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.2));
+            border: 1px solid rgba(59,130,246,0.5);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 60px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .google-cyber:hover {
+            background: linear-gradient(135deg, rgba(59,130,246,0.4), rgba(139,92,246,0.4));
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(59,130,246,0.4);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding-bottom: 90px;
+            display: none;
+        }
+
+        /* Header */
+        .cyber-header {
+            background: rgba(3,5,11,0.7);
+            backdrop-filter: blur(20px);
+            padding: 18px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(59,130,246,0.3);
+        }
+
+        .header-glow {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-chip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(59,130,246,0.15);
+            padding: 6px 16px 6px 8px;
+            border-radius: 60px;
+            border: 1px solid rgba(59,130,246,0.3);
+            transition: all 0.3s;
+        }
+
+        .user-chip:hover { background: rgba(59,130,246,0.25); transform: scale(1.02); }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 0 15px rgba(59,130,246,0.5);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 24px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(15,25,45,0.7), rgba(5,10,25,0.8));
+            border-radius: 28px;
+            padding: 24px 16px;
+            text-align: center;
+            border: 1px solid rgba(59,130,246,0.2);
+            transition: all 0.4s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            border-color: #3b82f6;
+            box-shadow: 0 0 30px rgba(59,130,246,0.2);
+        }
+
+        .stat-icon {
+            font-size: 42px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Neon Cards */
+        .neon-card {
+            background: rgba(10,20,35,0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 32px;
+            padding: 24px;
+            margin: 0 20px 20px;
+            border: 1px solid rgba(59,130,246,0.2);
+            transition: all 0.3s;
+        }
+
+        .neon-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 25px rgba(59,130,246,0.15);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-title i {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 24px;
+        }
+
+        /* Form */
+        .input-neon {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 60px;
+            font-size: 15px;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 15px;
+        }
+
+        .input-neon:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 20px rgba(59,130,246,0.2);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            padding: 16px;
+            border-radius: 60px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(59,130,246,0.4);
+        }
+
+        /* List Items */
+        .list-item {
+            background: rgba(0,0,0,0.4);
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.3s;
+        }
+
+        .list-item:hover {
+            border-color: #3b82f6;
+            transform: translateX(8px);
+            background: rgba(59,130,246,0.1);
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-success { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        .badge-warning { background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
+        .badge-danger { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+
+        /* Referral Box */
+        .referral-glow {
+            background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
+            border-radius: 32px;
+            padding: 24px;
+            margin: 0 20px 20px;
+            border: 1px solid rgba(59,130,246,0.3);
+            text-align: center;
+        }
+
+        .referral-glow p { color: #3b82f6; font-weight: 600; margin-bottom: 15px; }
+
+        .copy-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .copy-group input {
+            flex: 1;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 60px;
+            padding: 12px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .copy-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0 24px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover { background: #2563eb; transform: scale(1.02); }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(3,5,11,0.9);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 20px 22px;
+            border-top: 1px solid rgba(59,130,246,0.3);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 20px;
+            border-radius: 60px;
+            transition: all 0.3s;
+        }
+
+        .nav-item i { font-size: 24px; color: #64748b; }
+        .nav-item span { font-size: 11px; color: #64748b; }
+
+        .nav-item.active i,
+        .nav-item.active span { color: #3b82f6; }
+
+        .nav-item.active {
+            background: rgba(59,130,246,0.15);
+            transform: translateY(-5px);
+        }
+
+        .fab-logout {
+            position: fixed;
+            bottom: 95px;
+            right: 20px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(239,68,68,0.4);
+            transition: all 0.3s;
+            z-index: 99;
+        }
+
+        .fab-logout:hover { transform: scale(1.1) rotate(90deg); }
+
+        .toast {
+            position: fixed;
+            bottom: 110px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 60px;
+            text-align: center;
+            display: none;
+            z-index: 200;
+            font-weight: 600;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeUp 0.4s ease; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #64748b;
+        }
+
+        .empty-state i { font-size: 55px; margin-bottom: 15px; opacity: 0.5; }
+        .loading { text-align: center; padding: 50px; color: #64748b; }
+    </style>
+</head>
+<body>
+
+<div class="cyber-grid"></div>
+<div class="neon-orb orb-blue"></div>
+<div class="neon-orb orb-purple"></div>
+<div class="neon-orb orb-pink"></div>
+
+<div id="loginScreen" class="login-screen">
+    <div class="login-card">
+        <div class="cyber-logo">✨ GmailSell</div>
+        <p>Sell Gmail accounts • Earn $1.20 each • Refer & earn $0.10</p>
+        <button id="googleLoginBtn" class="google-cyber">
+            <i class="fab fa-google"></i> Continue with Google
+        </button>
+        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(59,130,246,0.2);">
+            <span style="color: #3b82f6; font-size: 13px;"><i class="fas fa-gift"></i> Refer & earn $0.10 per referral</span>
+        </div>
+    </div>
+</div>
+
+<div id="dashboard" class="dashboard">
+    <div class="cyber-header">
+        <div class="header-glow"><i class="fas fa-bolt"></i> GmailSell</div>
+        <div class="user-chip">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <span id="userName" style="color:white; font-weight:500;">User</span>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-dollar-sign"></i></div><div class="stat-label">Price/Gmail</div><div class="stat-value">$1.20</div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-wallet"></i></div><div class="stat-label">Balance</div><div class="stat-value" id="balance">$0.00</div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-label">Total Earned</div><div class="stat-value" id="totalEarned">$0.00</div></div>
+    </div>
+
+    <div id="sellTab" class="tab-content active">
+        <div class="neon-card">
+            <div class="card-title"><i class="fas fa-envelope"></i> Sell Gmail Account</div>
+            <form id="sellForm">
+                <input type="email" id="gmailEmail" class="input-neon" placeholder="Gmail address" required>
+                <input type="password" id="gmailPassword" class="input-neon" placeholder="Password" required>
+                <button type="submit" class="btn-gradient" id="sellBtn"><i class="fas fa-rocket"></i> Sell Now - $1.20</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="historyTab" class="tab-content">
+        <div class="neon-card">
+            <div class="card-title"><i class="fas fa-history"></i> Sales History</div>
+            <div id="salesList"><div class="loading">Loading...</div></div>
+        </div>
+    </div>
+
+    <div id="withdrawTab" class="tab-content">
+        <div class="neon-card">
+            <div class="card-title"><i class="fab fa-bitcoin"></i> Withdraw Funds</div>
+            <form id="withdrawForm">
+                <input type="text" id="btcAddress" class="input-neon" placeholder="Bitcoin wallet address" required>
+                <input type="number" id="withdrawAmount" class="input-neon" placeholder="Amount (Min $29)" step="0.01" required>
+                <button type="submit" class="btn-gradient" id="withdrawBtn"><i class="fas fa-paper-plane"></i> Request Withdrawal</button>
+            </form>
+        </div>
+        <div class="neon-card">
+            <div class="card-title"><i class="fas fa-list"></i> Withdrawal History</div>
+            <div id="withdrawList"><div class="loading">Loading...</div></div>
+        </div>
+    </div>
+
+    <div id="referralsTab" class="tab-content">
+        <div class="referral-glow">
+            <p><i class="fas fa-gift"></i> Share this link & earn $0.10 per referral!</p>
+            <div class="copy-group">
+                <input type="text" id="referralLink" readonly>
+                <button id="copyLinkBtn" class="copy-btn">Copy</button>
+            </div>
+        </div>
+        <div class="neon-card">
+            <div class="card-title"><i class="fas fa-users"></i> Your Referrals (<span id="referralCount">0</span>)</div>
+            <div id="referralsList"><div class="loading">Loading...</div></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-item active" data-tab="sell"><i class="fas fa-dollar-sign"></i><span>Sell</span></button>
+        <button class="nav-item" data-tab="history"><i class="fas fa-history"></i><span>History</span></button>
+        <button class="nav-item" data-tab="withdraw"><i class="fab fa-bitcoin"></i><span>Withdraw</span></button>
+        <button class="nav-item" data-tab="referrals"><i class="fas fa-users"></i><span>Refer</span></button>
+    </div>
+
+    <button id="logoutBtn" class="fab-logout"><i class="fas fa-sign-out-alt"></i></button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBChVfSCJhhxhDgXWM5x3ryrwYtVZmwSmc",
+        authDomain: "sellapp-66d68.firebaseapp.com",
+        projectId: "sellapp-66d68",
+        storageBucket: "sellapp-66d68.firebasestorage.app",
+        messagingSenderId: "478211272161",
+        appId: "1:478211272161:web:ed55d6c8b366a192ba36a0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let currentUser = null;
+
+    // Get referral code from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const referralCodeFromUrl = urlParams.get('ref');
+
+    function showToast(msg, isErr = false) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.style.background = isErr ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #10b981, #059669)';
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    // Real-time user balance listener
+    function listenUserBalance(userId) {
+        db.collection('users').doc(userId).onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                document.getElementById('balance').innerHTML = `$${(data.balance || 0).toFixed(2)}`;
+                document.getElementById('totalEarned').innerHTML = `$${(data.totalEarned || 0).toFixed(2)}`;
+            }
+        });
+    }
+
+    // Real-time sales history
+    function listenSalesHistory(userId) {
+        db.collection('gmailSales')
+            .where('userId', '==', userId)
+            .orderBy('createdAt', 'desc')
+            .onSnapshot((snapshot) => {
+                const div = document.getElementById('salesList');
+                if (snapshot.empty) {
+                    div.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No sales yet</p></div>';
+                    return;
+                }
+                
+                let html = '';
+                snapshot.forEach(doc => {
+                    const sale = doc.data();
+                    const date = sale.createdAt ? sale.createdAt.toDate().toLocaleString() : 'Just now';
+                    let badgeClass = '';
+                    let badgeText = '';
+                    
+                    if (sale.status === 'approved') {
+                        badgeClass = 'badge-success';
+                        badgeText = '✅ Approved';
+                    } else if (sale.status === 'rejected') {
+                        badgeClass = 'badge-danger';
+                        badgeText = `❌ ${sale.rejectionReason || 'Rejected'}`;
+                    } else {
+                        badgeClass = 'badge-warning';
+                        badgeText = '⏳ Pending';
+                    }
+                    
+                    html += `
+                        <div class="list-item">
+                            <div>
+                                <p style="color:white; font-weight:500;">${sale.gmailEmail}</p>
+                                <p style="font-size:11px; color:#64748b;">${date}</p>
+                            </div>
+                            <span class="badge ${badgeClass}">${badgeText}</span>
+                        </div>
+                    `;
+                });
+                div.innerHTML = html;
+            });
+    }
+
+    // Real-time withdrawal history
+    function listenWithdrawHistory(userId) {
+        db.collection('withdrawals')
+            .where('userId', '==', userId)
+            .orderBy('createdAt', 'desc')
+            .onSnapshot((snapshot) => {
+                const div = document.getElementById('withdrawList');
+                if (snapshot.empty) {
+                    div.innerHTML = '<div class="empty-state"><i class="fas fa-receipt"></i><p>No withdrawals yet</p></div>';
+                    return;
+                }
+                
+                let html = '';
+                snapshot.forEach(doc => {
+                    const wd = doc.data();
+                    const date = wd.createdAt ? wd.createdAt.toDate().toLocaleString() : 'Just now';
+                    let badgeClass = '';
+                    let badgeText = '';
+                    
+                    if (wd.status === 'completed') {
+                        badgeClass = 'badge-success';
+                        badgeText = '✅ Completed';
+                    } else if (wd.status === 'rejected') {
+                        badgeClass = 'badge-danger';
+                        badgeText = '❌ Rejected';
+                    } else {
+                        badgeClass = 'badge-warning';
+                        badgeText = '⏳ Pending';
+                    }
+                    
+                    html += `
+                        <div class="list-item">
+                            <div>
+                                <p style="color:white; font-weight:500;">$${wd.amount}</p>
+                                <p style="font-size:11px; color:#64748b;">${wd.btcAddress.substring(0,20)}...</p>
+                                <p style="font-size:10px; color:#475569;">${date}</p>
+                            </div>
+                            <span class="badge ${badgeClass}">${badgeText}</span>
+                        </div>
+                    `;
+                });
+                div.innerHTML = html;
+            });
+    }
+
+    // Real-time referrals list
+    function listenReferrals(userId) {
+        db.collection('users').doc(userId).get().then(doc => {
+            const userData = doc.data();
+            const myReferralCode = userData.referralCode;
+            
+            db.collection('users')
+                .where('referredBy', '==', myReferralCode)
+                .onSnapshot((snapshot) => {
+                    const div = document.getElementById('referralsList');
+                    document.getElementById('referralCount').innerHTML = snapshot.size;
+                    
+                    if (snapshot.empty) {
+                        div.innerHTML = '<div class="empty-state"><i class="fas fa-user-plus"></i><p>No referrals yet</p><p style="font-size:12px;">Share your link to earn $0.10 each!</p></div>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const ref = doc.data();
+                        html += `
+                            <div class="list-item">
+                                <div>
+                                    <p style="color:white; font-weight:500;">${ref.name || ref.email}</p>
+                                    <p style="font-size:11px; color:#64748b;">Joined: ${ref.createdAt ? ref.createdAt.toDate().toLocaleDateString() : 'Recently'}</p>
+                                </div>
+                                <span class="badge badge-success">+$0.10</span>
+                            </div>
+                        `;
+                    });
+                    div.innerHTML = html;
+                });
+        });
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            
+            const userRef = db.collection('users').doc(user.uid);
+            const userDoc = await userRef.get();
+            
+            if (!userDoc.exists) {
+                // NEW USER - Check for referral
+                let referredByCode = null;
+                let referrerId = null;
+                
+                if (referralCodeFromUrl) {
+                    // Find who has this referral code
+                    const referrerQuery = await db.collection('users')
+                        .where('referralCode', '==', referralCodeFromUrl)
+                        .get();
+                    
+                    if (!referrerQuery.empty) {
+                        const referrer = referrerQuery.docs[0];
+                        referredByCode = referralCodeFromUrl;
+                        referrerId = referrer.id;
+                        
+                        // Add $0.10 to referrer's balance
+                        const referrerData = referrer.data();
+                        await db.collection('users').doc(referrerId).update({
+                            balance: (referrerData.balance || 0) + 0.10,
+                            totalEarned: (referrerData.totalEarned || 0) + 0.10,
+                            totalReferrals: firebase.firestore.FieldValue.increment(1)
+                        });
+                        
+                        showToast(`Welcome! You joined via referral. Referrer earned $0.10!`);
+                    }
+                }
+                
+                // Create new user
+                await userRef.set({
+                    uid: user.uid,
+                    name: user.displayName || user.email.split('@')[0],
+                    email: user.email,
+                    role: 'user',
+                    balance: 0,
+                    totalEarned: 0,
+                    totalSales: 0,
+                    totalReferrals: 0,
+                    status: 'active',
+                    referralCode: user.uid.substring(0, 8),
+                    referredBy: referredByCode,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                if (referredByCode) {
+                    showToast(`🎉 Referral bonus added to your referrer!`);
+                }
+            }
+            
+            const freshDoc = await userRef.get();
+            const userData = freshDoc.data();
+            
+            document.getElementById('userAvatar').innerHTML = (userData.name || 'U').charAt(0).toUpperCase();
+            document.getElementById('userName').innerHTML = userData.name || user.displayName;
+            document.getElementById('balance').innerHTML = `$${(userData.balance || 0).toFixed(2)}`;
+            document.getElementById('totalEarned').innerHTML = `$${(userData.totalEarned || 0).toFixed(2)}`;
+            document.getElementById('referralLink').value = `${window.location.origin}?ref=${userData.referralCode}`;
+            
+            listenUserBalance(user.uid);
+            listenSalesHistory(user.uid);
+            listenWithdrawHistory(user.uid);
+            listenReferrals(user.uid);
+        } else {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+        }
+    });
+
+    document.getElementById('googleLoginBtn').addEventListener('click', () => {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch(e => showToast('Login error: ' + e.message, true));
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        auth.signOut();
+        showToast('Logged out');
+    });
+
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.tab;
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`${tab}Tab`).classList.add('active');
+        });
+    });
+
+    // Sell Form
+    document.getElementById('sellForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+
+        const btn = document.getElementById('sellBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+        try {
+            await db.collection('gmailSales').add({
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                gmailEmail: document.getElementById('gmailEmail').value,
+                gmailPassword: document.getElementById('gmailPassword').value,
+                status: 'pending',
+                amount: 1.2,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('✅ Gmail submitted for verification!');
+            document.getElementById('sellForm').reset();
+        } catch (error) {
+            showToast('Error: ' + error.message, true);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-rocket"></i> Sell Now - $1.20';
+        }
+    });
+
+    // Withdraw Form
+    document.getElementById('withdrawForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+
+        const address = document.getElementById('btcAddress').value;
+        const amount = parseFloat(document.getElementById('withdrawAmount').value);
+
+        if (amount < 29) {
+            showToast('Minimum withdrawal is $29!', true);
+            return;
+        }
+        
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        const currentBalance = userDoc.data().balance || 0;
+        
+        if (amount > currentBalance) {
+            showToast('Insufficient balance!', true);
+            return;
+        }
+
+        const btn = document.getElementById('withdrawBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        try {
+            await db.collection('withdrawals').add({
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                btcAddress: address,
+                amount: amount,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('Withdrawal request submitted!');
+            document.getElementById('withdrawForm').reset();
+        } catch (error) {
+            showToast('Error: ' + error.message, true);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Request Withdrawal';
+        }
+    });
+
+    // Copy Link
+    document.getElementById('copyLinkBtn').addEventListener('click', () => {
+        const input = document.getElementById('referralLink');
+        input.select();
+        document.execCommand('copy');
+        showToast('Referral link copied!');
+    });
+</script>
+</body>
+</html>
